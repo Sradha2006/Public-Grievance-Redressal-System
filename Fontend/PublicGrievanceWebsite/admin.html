@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">🏛️ Public Grievance Portal</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="register.html">Citizen Registration</a>
+    </nav>
+</header>
+
+<section class="services">
+    <h2>Admin Login</h2>
+    <p>Authorized department officials can access the dashboard.</p>
+
+    <form class="registration-form" id="loginForm">
+        <label>Admin Username</label>
+        <input type="text" id="username"
+               placeholder="Enter username" required>
+
+        <label>Password</label>
+        <input type="password" id="password"
+               placeholder="Enter password" required>
+
+        <button type="submit">Login to Dashboard</button>
+    </form>
+
+    <p id="message"></p>
+</section>
+
+<footer>
+    <h3>Public Grievance Redressal System</h3>
+    <p>Secure Administration Portal</p>
+</footer>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit",
+async function(event) {
+    event.preventDefault();
+
+    const data = new URLSearchParams();
+    data.append("username", document.getElementById("username").value);
+    data.append("password", document.getElementById("password").value);
+
+    const message = document.getElementById("message");
+    message.textContent = "Checking login...";
+
+    try {
+        const response = await fetch(
+            "http://localhost:8090/api/admin/login",
+            {
+                method: "POST",
+                body: data
+            }
+        );
+
+        const result = await response.text();
+
+        if (response.ok && result === "LOGIN_SUCCESS") {
+            window.location.href = "admin-dashboard.html";
+        } else {
+            message.textContent = result;
+        }
+    } catch (error) {
+        message.textContent = "Server connection failed!";
+    }
+});
+</script>
+
+</body>
+</html>

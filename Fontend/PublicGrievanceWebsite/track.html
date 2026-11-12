@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Complaint</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">🏛️ Public Grievance Portal</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="register.html">Register</a>
+        <a href="complaint.html">Submit Complaint</a>
+    </nav>
+</header>
+
+<section class="services">
+    <h2>Track Your Complaint</h2>
+    <p>Check the latest status of your complaint.</p>
+
+    <form class="registration-form" id="trackForm">
+        <label>Complaint ID</label>
+        <input type="number" name="complaintId"
+               placeholder="Enter your Complaint ID" required>
+        <button type="submit">Track Now</button>
+    </form>
+
+    <div id="result" class="card" style="display:none;">
+        <h3>Complaint Details</h3>
+        <pre id="details" style="white-space:pre-wrap;"></pre>
+    </div>
+
+    <div id="message"></div>
+
+    <div class="card">
+        <h3>Complaint Status Guide</h3>
+        <p>🟡 Pending — Complaint received</p>
+        <p>🔵 In Progress — Department is working on it</p>
+        <p>🟢 Resolved — Complaint successfully resolved</p>
+        <p>🔴 Rejected — Complaint was rejected</p>
+    </div>
+</section>
+
+<footer>
+    <h3>Public Grievance Redressal System</h3>
+    <p>Your Voice Matters.</p>
+</footer>
+
+<script>
+document.getElementById("trackForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch("http://localhost:8090/api/track", {
+            method: "POST",
+            body: new URLSearchParams(formData)
+        });
+
+        const data = await response.text();
+
+        if (response.ok) {
+            document.getElementById("details").textContent = data;
+            document.getElementById("result").style.display = "block";
+            document.getElementById("message").textContent = "";
+        } else {
+            document.getElementById("result").style.display = "none";
+            document.getElementById("message").textContent = data;
+        }
+
+    } catch (error) {
+        document.getElementById("message").textContent =
+            "Server connection failed!";
+    }
+});
+</script>
+
+</body>
+</html>

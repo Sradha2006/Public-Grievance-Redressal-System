@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Complaint</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">🏛️ Public Grievance Portal</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="register.html">Register</a>
+        <a href="track.html">Track Complaint</a>
+    </nav>
+</header>
+
+<section class="services">
+    <h2>Submit Your Complaint</h2>
+    <p>Tell us about the problem in your area.</p>
+
+    <form class="registration-form" id="complaintForm">
+
+        <label>Citizen ID</label>
+        <input type="number" name="citizenId" placeholder="Enter your Citizen ID" required>
+
+        <label>Department</label>
+        <select name="departmentId" required>
+            <option value="">Select Department</option>
+            <option value="1">Road and Transport</option>
+            <option value="2">Water Supply</option>
+            <option value="3">Electricity</option>
+            <option value="4">Sanitation</option>
+        </select>
+
+        <label>Complaint Title</label>
+        <input type="text" name="title" placeholder="Enter complaint title" required>
+
+        <label>Location</label>
+        <input type="text" name="location" placeholder="Enter problem location" required>
+
+        <label>Complaint Description</label>
+        <textarea name="description" placeholder="Explain your problem..." required></textarea>
+
+        <button type="submit">Submit Complaint</button>
+        <p id="message"></p>
+
+    </form>
+</section>
+
+<footer>
+    <h3>Public Grievance Redressal System</h3>
+    <p>Your Voice Matters.</p>
+</footer>
+
+<script>
+document.getElementById("complaintForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const data = new URLSearchParams(new FormData(this));
+
+    try {
+        const response = await fetch("http://localhost:8090/api/complaint", {
+            method: "POST",
+            body: data
+        });
+
+        const result = await response.text();
+        document.getElementById("message").innerText = result;
+
+        if (response.ok && result.includes("Successful")) {
+            this.reset();
+        }
+
+    } catch (error) {
+        document.getElementById("message").innerText = "Server connection failed!";
+    }
+});
+</script>
+
+</body>
+</html>

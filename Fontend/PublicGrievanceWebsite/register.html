@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citizen Registration</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">🏛️ Public Grievance Portal</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="complaint.html">Submit Complaint</a>
+        <a href="track.html">Track Complaint</a>
+    </nav>
+</header>
+
+<section class="services">
+    <h2>Citizen Registration</h2>
+    <p>Create your account to register public complaints.</p>
+
+    <form class="registration-form" id="registerForm">
+
+        <label>Full Name</label>
+        <input type="text" name="fullName" placeholder="Enter your full name" required>
+
+        <label>Email Address</label>
+        <input type="email" name="email" placeholder="Enter your email" required>
+
+        <label>Phone Number</label>
+        <input type="tel" name="phone" placeholder="Enter phone number" required>
+
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Create password" required>
+
+        <label>Address</label>
+        <textarea name="address" placeholder="Enter your address" required></textarea>
+
+        <button type="submit">Create Account</button>
+
+        <p id="message"></p>
+    </form>
+</section>
+
+<footer>
+    <h3>Public Grievance Redressal System</h3>
+    <p>Your Voice Matters.</p>
+</footer>
+
+<script>
+document.getElementById("registerForm").addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    const data = new URLSearchParams(formData);
+
+    try {
+        const response = await fetch("http://localhost:8090/api/register", {
+            method: "POST",
+            body: data
+        });
+
+        const result = await response.text();
+
+        document.getElementById("message").innerText = result;
+
+        if (result === "Registration Successful!") {
+            this.reset();
+        }
+
+    } catch (error) {
+        document.getElementById("message").innerText =
+            "Server connection failed. Please try again.";
+    }
+});
+</script>
+
+</body>
+</html>

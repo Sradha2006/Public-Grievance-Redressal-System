@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citizen Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">🏛️ Public Grievance Portal</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="register.html">Register</a>
+        <a href="complaint.html">Submit Complaint</a>
+        <a href="track.html">Track Complaint</a>
+    </nav>
+</header>
+
+<section class="services">
+    <h2>Citizen Login</h2>
+    <p>Login to access your grievance account.</p>
+
+    <form class="registration-form" id="loginForm">
+
+        <label>Email Address</label>
+        <input type="email" name="email"
+               placeholder="Enter your registered email" required>
+
+        <label>Password</label>
+        <input type="password" name="password"
+               placeholder="Enter your password"
+               autocomplete="current-password" required>
+
+        <button type="submit">Login</button>
+
+        <p id="message"></p>
+
+        <p>Don't have an account?
+            <a href="register.html">Register here</a>
+        </p>
+
+    </form>
+</section>
+
+<footer>
+    <h3>Public Grievance Redressal System</h3>
+    <p>Your Voice Matters.</p>
+</footer>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    const data = new URLSearchParams(formData);
+
+    try {
+        const response = await fetch("http://localhost:8090/api/login", {
+            method: "POST",
+            body: data
+        });
+
+        const result = await response.text();
+
+        document.getElementById("message").innerText = result;
+
+        if (result === "Login Successful!") {
+            window.location.href = "complaint.html";
+        }
+
+    } catch (error) {
+        document.getElementById("message").innerText =
+            "Server connection failed. Please try again.";
+    }
+});
+</script>
+
+</body>
+</html>

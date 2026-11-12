@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">🏛️ Grievance Admin</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="admin.html">Logout</a>
+    </nav>
+</header>
+
+<section class="services">
+    <h2>Admin Dashboard</h2>
+    <p>Manage and monitor citizen complaints.</p>
+
+    <div class="cards">
+        <div class="card">
+            <h3>All Complaints</h3>
+            <h2 id="allCount">0</h2>
+        </div>
+        <div class="card">
+            <h3>Pending</h3>
+            <h2 id="pendingCount">0</h2>
+        </div>
+        <div class="card">
+            <h3>In Progress</h3>
+            <h2 id="progressCount">0</h2>
+        </div>
+        <div class="card">
+            <h3>Resolved</h3>
+            <h2 id="resolvedCount">0</h2>
+        </div>
+    </div>
+
+    <h2 style="margin-top:35px;">All Complaints</h2>
+    <button class="web-button" onclick="loadComplaints()">
+        Refresh Complaints
+    </button>
+
+    <div id="complaints"
+         style="margin-top:20px; overflow-x:auto; white-space:pre-wrap;">
+        Loading complaints...
+    </div>
+
+    <h2 style="margin-top:35px;">Update Complaint Status</h2>
+
+    <form id="updateForm">
+        <input type="number" id="complaintId"
+               placeholder="Enter Complaint ID" required>
+
+        <select id="status" required>
+            <option value="">Select New Status</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Rejected">Rejected</option>
+        </select>
+
+        <button type="submit" class="web-button">
+            Update Status
+        </button>
+    </form>
+
+    <p id="updateMessage"></p>
+
+    <h2 style="margin-top:35px;">Resolution Report</h2>
+
+    <button class="web-button" onclick="loadReport()">
+        Generate Report
+    </button>
+
+    <pre id="report"
+         style="margin-top:20px; white-space:pre-wrap;"></pre>
+
+</section>
+
+<footer>
+    <h3>Public Grievance Redressal System</h3>
+    <p>Admin Management Portal</p>
+</footer>
+
+<script>
+const API = "http://localhost:8090";
+
+async function loadComplaints() {
+    const box = document.getElementById("complaints");
+    box.textContent = "Loading...";
+
+    try {
+        const response = await fetch(API + "/api/admin/complaints");
+        const text = await response.text();
+
+        if (!response.ok) throw new Error(text);
+
+        box.textContent = text;
+
+        const ids = ["allCount", "pendingCount",
+                     "progressCount", "resolvedCount"];
+
+        const counts = {
+            all: (text.match(/Complaint ID:/g) || []).length,
+            pending: (text.match(/Status: Pending/g) || []).length,
+            progress: (text.match(/Status: In Progress/g) || []).length,
+            resolved: (text.match(/Status: Resolved/g) || []).length
+        };
+
+        document.getElementById(ids[0]).textContent = counts.all;
+        document.getElementById(ids[1]).textContent = counts.pending;
+        document.getElementById(ids[2]).textContent = counts.progress;
+        document.getElementById(ids[3]).textContent = counts.resolved;
+
+    } catch (error) {
+        box.textContent = "Could not load complaints: " + error.message;
+    }
+}
+
+document.getElementById("updateForm").addEventListener("submit",
+async function(event) {
+    event.preventDefault();
+
+    const data = new URLSearchParams();
+    data.append("complaintId",
+        document.getElementById("complaintId").value);
+    data.append("status",
+        document.getElementById("status").value);
+
+    try {
+        const response = await fetch(API + "/api/admin/update", {
+            method: "POST",
+            body: data
+        });
+
+        const message = await response.text();
+        document.getElementById("updateMessage").textContent = message;
+
+        if (response.ok) {
+            loadComplaints();
+        }
+    } catch (error) {
+        document.getElementById("updateMessage").textContent =
+            "Update failed: " + error.message;
+    }
+});
+
+async function loadReport() {
+    const box = document.getElementById("report");
+    box.textContent = "Generating report...";
+
+    try {
+        const response = await fetch(API + "/api/admin/report");
+        const text = await response.text();
+
+        if (!response.ok) throw new Error(text);
+
+        box.textContent = text;
+    } catch (error) {
+        box.textContent = "Report failed: " + error.message;
+    }
+}
+
+loadComplaints();
+</script>
+
+</body>
+</html>
